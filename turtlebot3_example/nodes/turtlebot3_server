@@ -53,7 +53,7 @@ class Turtlebot3Action(object):
 
         cur_pos = data.position[0]
         diff_pos = cur_pos - last_pos
-        encoder = encoder + (diff_pos / TICK2RAD)
+        encoder += diff_pos / TICK2RAD
         self.right_encoder = encoder
 
     def turn(self, angle):
@@ -62,11 +62,7 @@ class Turtlebot3Action(object):
             self.init_stats = False
         diff_encoder = (np.deg2rad(angle) * 0.080) / (0.207 / 4096)
         while (abs(self.init_right_encoder - self.right_encoder) < abs(diff_encoder)):
-            if diff_encoder >= 0:
-                self.twist.angular.z = -0.5
-            else:
-                self.twist.angular.z = 0.5
-
+            self.twist.angular.z = -0.5 if diff_encoder >= 0 else 0.5
             self.cmd_pub.publish(self.twist)
             self.r.sleep()
         self.init_stats = True
@@ -109,7 +105,6 @@ class Turtlebot3Action(object):
         self.twist = Twist()
         self.r = rospy.Rate(15)
         self.r1 = rospy.Rate(1)
-        success = True
         mode = goal.goal.x
         patrol_count = int(goal.goal.z)
         circle_mode = True
@@ -134,16 +129,16 @@ class Turtlebot3Action(object):
                     self.go_front(area[i], i)
                     self.turn(-120)
             elif mode == 3:
-                while(circle_mode):
+                while (circle_mode):
                     if self.position.x < -goal.goal.y / 2:
                         half_patrol = True
                         count_flag = True
                     else:
                         self.twist.linear.x = goal.goal.y / 2
                         self.twist.angular.z = 0.5
-                    if half_patrol == True and self.position.x > 0:
+                    if half_patrol and self.position.x > 0:
                         if count_flag == True:
-                            circle_count = circle_count + 1
+                            circle_count += 1
                             count_flag = False
                         half_patrol = False
                         if circle_count == patrol_count:
@@ -153,7 +148,7 @@ class Turtlebot3Action(object):
                     self.cmd_pub.publish(self.twist)
                     self.r.sleep()
 
-        if success:
+        if success := True:
             self._result = 0
             rospy.loginfo('%s: Succeeded' % self._action_name)
             self._as.set_succeeded(self._result)

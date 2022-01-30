@@ -104,18 +104,14 @@ class GotoPoint():
             (position, rotation) = self.get_odom()
             if goal_z >= 0:
                 if rotation <= goal_z and rotation >= goal_z - pi:
-                    move_cmd.linear.x = 0.00
                     move_cmd.angular.z = 0.5
                 else:
-                    move_cmd.linear.x = 0.00
                     move_cmd.angular.z = -0.5
+            elif rotation <= goal_z + pi and rotation > goal_z:
+                move_cmd.angular.z = -0.5
             else:
-                if rotation <= goal_z + pi and rotation > goal_z:
-                    move_cmd.linear.x = 0.00
-                    move_cmd.angular.z = -0.5
-                else:
-                    move_cmd.linear.x = 0.00
-                    move_cmd.angular.z = 0.5
+                move_cmd.angular.z = 0.5
+            move_cmd.linear.x = 0.00
             self.cmd_vel.publish(move_cmd)
             r.sleep()
 

@@ -29,11 +29,7 @@ class Illumination():
 
     def get_illumination(self, sensor):
         twist = Twist()
-        if sensor.illumination < 200:
-            linear_vel = 0.05
-        else:
-            linear_vel = 0
-
+        linear_vel = 0.05 if sensor.illumination < 200 else 0
         twist.linear.x = linear_vel
         self.cmd_pub.publish(twist)
 

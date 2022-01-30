@@ -29,11 +29,7 @@ class Cliff():
 
     def get_cliff(self, sensor):
         twist = Twist()
-        if sensor.cliff < 1000:
-            linear_vel = 0
-        else:
-            linear_vel = 0.05
-
+        linear_vel = 0 if sensor.cliff < 1000 else 0.05
         twist.linear.x = linear_vel
         self.cmd_pub.publish(twist)
 

@@ -29,11 +29,7 @@ class Sonar():
 
     def get_sonar(self, sensor):
         twist = Twist()
-        if sensor.sonar < 10:
-            linear_vel = 0
-        else:
-            linear_vel = 0.05
-
+        linear_vel = 0 if sensor.sonar < 10 else 0.05
         twist.linear.x = linear_vel
         self.cmd_pub.publish(twist)
 
